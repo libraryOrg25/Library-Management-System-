@@ -15,9 +15,7 @@ public class FileStorage {
 
     public static String currentUser = null;
 
-    // ------------------------------------------------------------------
-    // USERS
-    // ------------------------------------------------------------------
+ 
 
     public static List<User> loadUsers() {
         List<User> users = new ArrayList<>();
