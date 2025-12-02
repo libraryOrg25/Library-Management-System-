@@ -61,7 +61,7 @@ public class LoginUI extends JFrame {
         goToRegister.setForeground(Color.BLUE);
         add(goToRegister);
 
-        // Event: تسجيل الدخول
+        
         loginBtn.addActionListener(e -> {
             String email = emailField.getText().trim();
             String password = new String(passwordField.getPassword()).trim();
@@ -73,16 +73,15 @@ public class LoginUI extends JFrame {
 
             User user = authService.login(email, password);
             if (user != null) {
-                // ✅ التحقق من الدور (role)
+               
                 if (user.getRole().equalsIgnoreCase("admin")) {
                     JOptionPane.showMessageDialog(this, "Welcome Admin " + user.getUsername());
-                    dispose(); // إغلاق صفحة تسجيل الدخول
-                    new AdminDashboard().setVisible(true); // فتح واجهة الأدمن
+                    dispose(); 
+                    new AdminDashboard().setVisible(true); 
                 } else {
                     JOptionPane.showMessageDialog(this, "Welcome " + user.getUsername());
                     dispose(); 
-                    // ⚠️ لاحقًا راح نضيف هنا واجهة المستخدم العادية UserDashboard
-                    // حالياً نقدر نرجعه مؤقتاً إلى RegisterUI أو نترك رسالة
+                 
                     JOptionPane.showMessageDialog(this, "User dashboard under development!");
                 }
             } else {
