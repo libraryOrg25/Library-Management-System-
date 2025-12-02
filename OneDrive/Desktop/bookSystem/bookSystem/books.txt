@@ -1,7 +1,7 @@
 hello,anoud,7862,Book,3
-Harry Potter,JK Rowling,1234,Book,20
+Harry Potter,JK Rowling,1234,Book,19
 HarryPotter,JK Rowling,2589,CD,10
-Friends,Jalson,469523,Book,50
+Friends,Jalson,469523,Book,49
 Design,Claren,69783,CD,25
-harry potter,JK Rowling,12365,Book,59
-123,Roaa,54654,Book,89
+harry potter,JK Rowling,12365,Book,58
+123,Roaa,54654,Book,88

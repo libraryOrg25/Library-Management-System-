@@ -6,13 +6,23 @@ import com.library.service.AuthService;
 
 public class RegisterUI extends JFrame {
 
-    private JTextField usernameField, emailField;
-    private JPasswordField passwordField;
-    private JComboBox<String> roleBox;
-    private AuthService authService;
+    // ====== ⬇️ صاروا protected عشان الاختبار يقدر يوصلهم
+    protected JTextField usernameField, emailField;
+    protected JPasswordField passwordField;
+    protected JComboBox<String> roleBox;
+    protected JButton registerBtn;
+    protected AuthService authService;
+
+    // ============= Inject-able AuthService for testing =================
+    protected AuthService createAuthService() {
+        return new AuthService();
+    }
 
     public RegisterUI() {
-        authService = new AuthService();
+
+        // نستخدم الـ factory method بدل new AuthService()
+        authService = createAuthService();
+
         setTitle("Create an Account");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 450);
@@ -28,6 +38,7 @@ public class RegisterUI extends JFrame {
         JLabel userLabel = new JLabel("User name");
         userLabel.setBounds(50, 90, 100, 25);
         add(userLabel);
+
         usernameField = new JTextField();
         usernameField.setBounds(50, 115, 300, 35);
         usernameField.setBackground(Color.BLACK);
@@ -38,6 +49,7 @@ public class RegisterUI extends JFrame {
         JLabel emailLabel = new JLabel("Email");
         emailLabel.setBounds(50, 160, 100, 25);
         add(emailLabel);
+
         emailField = new JTextField();
         emailField.setBounds(50, 185, 300, 35);
         emailField.setBackground(Color.BLACK);
@@ -48,6 +60,7 @@ public class RegisterUI extends JFrame {
         JLabel passLabel = new JLabel("Password");
         passLabel.setBounds(50, 230, 100, 25);
         add(passLabel);
+
         passwordField = new JPasswordField();
         passwordField.setBounds(50, 255, 300, 35);
         passwordField.setBackground(Color.BLACK);
@@ -58,13 +71,15 @@ public class RegisterUI extends JFrame {
         JLabel roleLabel = new JLabel("Role");
         roleLabel.setBounds(50, 300, 100, 25);
         add(roleLabel);
+
         roleBox = new JComboBox<>(new String[]{"admin", "user"});
         roleBox.setBounds(50, 325, 300, 35);
         roleBox.setBackground(Color.BLACK);
         roleBox.setForeground(Color.WHITE);
         add(roleBox);
 
-        JButton registerBtn = new JButton("REGISTER");
+        // ====== ⬇️ زر التسجيل صار protected وقابل للاختبار
+        registerBtn = new JButton("REGISTER");
         registerBtn.setBounds(100, 375, 200, 35);
         registerBtn.setBackground(Color.WHITE);
         registerBtn.setForeground(Color.BLACK);
@@ -72,7 +87,6 @@ public class RegisterUI extends JFrame {
         registerBtn.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         add(registerBtn);
 
-        // ✅ زر الانتقال لصفحة تسجيل الدخول
         JButton goToLogin = new JButton("Already have an account? Log in");
         goToLogin.setBounds(80, 415, 250, 25);
         goToLogin.setFont(new Font("SansSerif", Font.PLAIN, 12));
@@ -82,7 +96,7 @@ public class RegisterUI extends JFrame {
         goToLogin.setForeground(Color.BLUE);
         add(goToLogin);
 
-        // Event: التسجيل
+        // ================= Register Button Event =====================
         registerBtn.addActionListener(e -> {
             String username = usernameField.getText().trim();
             String email = emailField.getText().trim();
@@ -90,22 +104,25 @@ public class RegisterUI extends JFrame {
             String role = (String) roleBox.getSelectedItem();
 
             if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please fill all fields", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Please fill all fields",
+                        "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             boolean success = authService.register(username, email, password, role);
+
             if (success) {
                 JOptionPane.showMessageDialog(this, "Account created successfully!");
             } else {
-                JOptionPane.showMessageDialog(this, "Email already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Email already exists!",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Event: الانتقال لصفحة تسجيل الدخول
+        // ============== Go to Login ======================
         goToLogin.addActionListener(e -> {
-            dispose(); // إغلاق صفحة التسجيل
-            new LoginUI().setVisible(true); // فتح صفحة تسجيل الدخول
+            dispose();
+            new LoginUI().setVisible(true);
         });
     }
 
