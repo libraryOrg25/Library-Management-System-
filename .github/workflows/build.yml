@@ -1,4 +1,4 @@
-name: Build and Analyz
+name: Build and Analyze
 
 on:
   push:
