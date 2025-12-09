@@ -3,10 +3,10 @@ name: Build and Analyze
 on:
   push:
     branches:
-      - anood
+      - main
   pull_request:
     branches:
-      - anood
+      - main
 
 jobs:
   build:
