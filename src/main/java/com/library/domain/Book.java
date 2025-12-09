@@ -18,7 +18,6 @@ public class Book implements Serializable {
         this.copies = copies;
     }
 
-
     public String getTitle() {
         return title;
     }

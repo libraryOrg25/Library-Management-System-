@@ -2,3 +2,5 @@ anoud,anoud@gmail.com,29anoud6,admin,0
 borrowed=
 roaa,roaa,roaa,user,0
 borrowed=123|54654|Book|2025-11-28|2025-12-26;HarryPotter|2589|CD|2025-11-28|2025-12-05;
+lana,zabadi@gmail,1234,admin,0
+borrowed=

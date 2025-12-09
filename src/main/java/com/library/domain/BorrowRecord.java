@@ -7,7 +7,7 @@ public class BorrowRecord implements Serializable {
 
     private String bookTitle;
     private String isbn;
-    private String type;    
+    private String type;     // BOOK or CD
     private LocalDate borrowDate;
     private LocalDate deadline;
 
@@ -19,6 +19,7 @@ public class BorrowRecord implements Serializable {
         this.deadline = deadline;
     }
 
+    // -------- getters --------
 
     public String getBookTitle() {
         return bookTitle;

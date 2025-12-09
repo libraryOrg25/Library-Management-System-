@@ -16,9 +16,8 @@ public class UserDashboard extends JFrame {
     private JPanel booksPanel, searchPanel, myBooksPanel, finesPanel;
     private String currentUserEmail;
 
-    public UserDashboard(String usernameOrEmail) {
-        this.currentUserEmail = usernameOrEmail;
-        FileStorage.currentUser = usernameOrEmail;
+    public UserDashboard(String userEmail) {
+        this.currentUserEmail = userEmail;
 
         setTitle("Library System - User");
         setSize(1100, 650);
@@ -26,6 +25,7 @@ public class UserDashboard extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
 
+        // ===================== TOP MENU ======================
         JPanel topMenu = new JPanel(null);
         topMenu.setBackground(new Color(210, 235, 255));
         topMenu.setBounds(0, 0, 1100, 60);
@@ -49,6 +49,7 @@ public class UserDashboard extends JFrame {
         topMenu.add(finesBtn);
         add(topMenu);
 
+        // ===================== CARD LAYOUT CONTENT ======================
         JPanel content = new JPanel(new CardLayout());
         content.setBounds(0, 60, 1100, 590);
         add(content);
@@ -63,6 +64,7 @@ public class UserDashboard extends JFrame {
         content.add(myBooksPanel, "MYBOOKS");
         content.add(finesPanel, "FINES");
 
+        // ===================== MENU BUTTONS LOGIC ======================
         booksBtn.addActionListener(e -> {
             int fine = getCurrentUserFine();
             if (fine > 0) {
@@ -97,6 +99,7 @@ public class UserDashboard extends JFrame {
         });
     }
 
+    // ============================================================
     private JButton createMenuButton(String txt, int x) {
         JButton b = new JButton(txt);
         b.setBounds(x, 10, 120, 40);
@@ -112,7 +115,9 @@ public class UserDashboard extends JFrame {
         return u.getFine();
     }
 
-  
+    // ============================================================
+    // BOOKS PANEL
+    // ============================================================
     private JPanel createBooksPanel() {
         JPanel panel = new JPanel(null);
         panel.setBackground(Color.WHITE);
@@ -195,6 +200,9 @@ public class UserDashboard extends JFrame {
         return panel;
     }
 
+    // ============================================================
+    // SEARCH PANEL
+    // ============================================================
     private JPanel createSearchPanel() {
         JPanel panel = new JPanel(null);
         panel.setBackground(Color.WHITE);
@@ -290,7 +298,9 @@ public class UserDashboard extends JFrame {
         return panel;
     }
 
-
+    // ============================================================
+    // MY BOOKS PANEL
+    // ============================================================
     private JPanel createMyBooksPanel() {
         JPanel panel = new JPanel(null);
         panel.setBackground(Color.WHITE);
@@ -355,7 +365,9 @@ public class UserDashboard extends JFrame {
         return panel;
     }
 
-
+    // ============================================================
+    // FINES PANEL
+    // ============================================================
     private JPanel createFinesPanel() {
         JPanel panel = new JPanel(null);
         panel.setBackground(Color.WHITE);
@@ -437,10 +449,5 @@ public class UserDashboard extends JFrame {
         panel.add(payPartial);
 
         return panel;
-    }
-
-    private void switchPanel(JPanel container, String name) {
-        CardLayout cl = (CardLayout) container.getLayout();
-        cl.show(container, name);
     }
 }

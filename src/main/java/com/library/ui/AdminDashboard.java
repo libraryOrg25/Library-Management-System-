@@ -46,7 +46,7 @@ public class AdminDashboard extends JFrame {
         tabbedPane.addTab("SEND EMAIL", emailPanel);
     }
 
-    private JPanel createAddBookPanel() {
+    public JPanel createAddBookPanel() {
         JPanel panel = new JPanel(null);
         panel.setBackground(Color.WHITE);
 
@@ -215,7 +215,7 @@ public class AdminDashboard extends JFrame {
             String message = msg.getText().trim();
             if (to.isEmpty()) { JOptionPane.showMessageDialog(this, "Enter email"); return; }
             try {
-                new com.library.service.EmailService().sendEmail(to, "Library Notification", message);
+                new com.library.service.EmailService(message, message).send(to, "Library Notification", message);
                 JOptionPane.showMessageDialog(this, "Email sent");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Send failed: " + ex.getMessage());
@@ -263,9 +263,7 @@ public class AdminDashboard extends JFrame {
                     JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
-
-                // 1) احذف المستخدم من الملف
-                FileStorage.removeUserByEmail(email);
+    FileStorage.findUserByEmail(email);
 
                 // 2) احذف كل الصفوف اللي إلها نفس الايميل من الجدول
                 for (int i = model.getRowCount() - 1; i >= 0; i--) {

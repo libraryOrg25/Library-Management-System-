@@ -9,8 +9,8 @@ public class User implements Serializable {
     private String username;
     private String email;
     private String password;
-    private String role; 
-    private int fine;   
+    private String role; // "user" or "admin"
+    private int fine;    // total fine balance
 
     // Borrowed Records
     private List<BorrowRecord> borrowedBooks = new ArrayList<>();
@@ -23,7 +23,7 @@ public class User implements Serializable {
         this.fine = 0;
     }
 
-   
+    // ----------- Getters & Setters ------------
 
     public String getUsername() {
         return username;
@@ -56,4 +56,9 @@ public class User implements Serializable {
     public void setBorrowedBooks(List<BorrowRecord> borrowedBooks) {
         this.borrowedBooks = borrowedBooks;
     }
+
+	public void setPassword(String string) {
+		// TODO Auto-generated method stub
+		
+	}
 }

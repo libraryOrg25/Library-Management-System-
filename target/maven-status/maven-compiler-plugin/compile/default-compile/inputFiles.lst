@@ -1,0 +1,14 @@
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\domain\Book.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\domain\BorrowRecord.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\domain\User.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\persistence\FileStorage.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\service\AuthService.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\service\EmailService.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\service\FineService.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\service\IEmailService.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\service\ReminderService.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\ui\AdminDashboard.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\ui\BooksAndCDsUI.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\ui\LoginUI.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\ui\RegisterUI.java
+C:\Users\nnu\OneDrive\Desktop\bookSystem\bookSystem\src\main\java\com\library\ui\UserDashboard.java
