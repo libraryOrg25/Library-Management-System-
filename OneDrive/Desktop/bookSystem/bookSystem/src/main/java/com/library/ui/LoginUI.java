@@ -4,15 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 import com.library.service.AuthService;
 import com.library.domain.User;
-import com.library.persistence.FileStorage;
 
 public class LoginUI extends JFrame {
+
     private JTextField emailField;
     private JPasswordField passwordField;
     private AuthService authService;
 
     public LoginUI() {
         authService = new AuthService();
+
         setTitle("Log In");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 350);
@@ -62,47 +63,48 @@ public class LoginUI extends JFrame {
         goToRegister.setForeground(Color.BLUE);
         add(goToRegister);
 
-        // LOGIN EVENT
+        // ================= LOGIN LOGIC =====================
         loginBtn.addActionListener(e -> {
             String email = emailField.getText().trim();
             String password = new String(passwordField.getPassword()).trim();
 
-            User user = authService.login(email, password);
-
-            if (user == null) {
-                JOptionPane.showMessageDialog(this, "Wrong email or password!",
+            if (email.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill all fields",
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            JOptionPane.showMessageDialog(this, "Login Successful!");
+            User user = authService.login(email, password);
 
-            // save current user
-            
+            if (user != null) {
 
-            dispose();
+                if (user.getRole().equalsIgnoreCase("admin")) {
+                    JOptionPane.showMessageDialog(this,
+                            "Welcome Admin " + user.getUsername());
+                    dispose();
+                    new AdminDashboard().setVisible(true);
 
-            if (user.getRole().equalsIgnoreCase("admin")) {
-                new AdminDashboard().setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Welcome " + user.getUsername());
+                    dispose();
+                    new UserDashboard(user.getEmail()).setVisible(true);  // ← FIXED
+                }
+
             } else {
-                
-                new UserDashboard(user.getEmail()).setVisible(true);
+                JOptionPane.showMessageDialog(this,
+                        "Invalid email or password!",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
+
+        goToRegister.addActionListener(e -> {
+            dispose();
+            new RegisterUI().setVisible(true);
+        });
     }
-    
+
     public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                LoginUI login = new LoginUI();
-                login.setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new LoginUI().setVisible(true));
     }
-
-
-    
-    
-    
-    
 }

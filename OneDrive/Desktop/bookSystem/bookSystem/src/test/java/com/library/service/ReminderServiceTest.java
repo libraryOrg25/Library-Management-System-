@@ -5,56 +5,112 @@ import com.library.domain.User;
 import com.library.persistence.FileStorage;
 import org.junit.jupiter.api.*;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
-public class ReminderServiceTest {
+class ReminderServiceTest {
 
-    private ReminderService reminder;
-    private IEmailService emailMock;
+    private IEmailService emailService;
+    private ReminderService reminderService;
+    private MockedStatic<FileStorage> fileStorageMock;
 
     @BeforeEach
     void setup() {
-        emailMock = mock(IEmailService.class);
-        reminder = new ReminderService(emailMock);
+        emailService = mock(IEmailService.class);
+        reminderService = new ReminderService(emailService);
+
+        fileStorageMock = mockStatic(FileStorage.class);
+    }
+
+    @AfterEach
+    void tearDown() {
+        fileStorageMock.close();
     }
 
     @Test
-    void testSendReminderToLateUsers() {
+    void testSendLateReturnReminders_sendsEmailToLateUsers() {
 
-        BorrowRecord lateRec = new BorrowRecord(
-                "Java Book", "1111", "Book",
-                LocalDate.now().minusDays(10),
+        // --- بيانات مستخدم واحد عنده كتاب متأخر ---
+        BorrowRecord lateRecord = new BorrowRecord(
+                "Java Book",
+                "12345",
+                "Book",
+                LocalDate.now().minusDays(10),   // borrow date
+                LocalDate.now().minusDays(5)     // deadline = 5 days late
+        );
+
+        User u = new User("fatima", "test@example.com", "123", "user");
+        u.getBorrowedBooks().add(lateRecord);
+
+        fileStorageMock.when(FileStorage::loadUsers)
+                .thenReturn(List.of(u));
+
+        // --- نفذ الفانكشن ---
+        reminderService.sendLateReturnReminders();
+
+        // --- تحقق أن الإيميل انبعت مرة واحدة ---
+        verify(emailService, times(1))
+                .send(eq("test@example.com"),
+                      eq("Late Book Reminder"),
+                      contains("5 days late returning"));
+    }
+
+    @Test
+    void testSendLateReturnReminders_noEmailWhenNotLate() {
+
+        BorrowRecord onTime = new BorrowRecord(
+                "Algorithms",
+                "999",
+                "Book",
+                LocalDate.now().minusDays(3),
+                LocalDate.now().plusDays(2)   // deadline NOT passed
+        );
+
+        User u = new User("ahmad", "a@a.com", "123", "user");
+        u.getBorrowedBooks().add(onTime);
+
+        fileStorageMock.when(FileStorage::loadUsers)
+                .thenReturn(List.of(u));
+
+        reminderService.sendLateReturnReminders();
+
+        // لا يجب إرسال أي إيميل
+        verify(emailService, never()).send(any(), any(), any());
+    }
+
+    @Test
+    void testSendLateReturnReminders_handlesMultipleUsers() {
+
+        BorrowRecord r1 = new BorrowRecord(
+                "DB Systems",
+                "111",
+                "Book",
+                LocalDate.now().minusDays(8),
                 LocalDate.now().minusDays(3)
         );
 
-        User lateUser = new User("fatima", "fatima@gmail.com", "1234", "user");
-        lateUser.setBorrowedBooks(List.of(lateRec));
+        BorrowRecord r2 = new BorrowRecord(
+                "Networks CD",
+                "222",
+                "CD",
+                LocalDate.now().minusDays(20),
+                LocalDate.now().minusDays(10)
+        );
 
+        User u1 = new User("lina", "lina@example.com", "123", "user");
+        u1.getBorrowedBooks().add(r1);
 
-        User onTimeUser = new User("mona", "mona@gmail.com", "000", "user");
-        onTimeUser.setBorrowedBooks(List.of(
-                new BorrowRecord("Python", "2222", "Book",
-                        LocalDate.now(),
-                        LocalDate.now().plusDays(5))
-        ));
+        User u2 = new User("sara", "sara@example.com", "123", "user");
+        u2.getBorrowedBooks().add(r2);
 
-        List<User> users = List.of(lateUser, onTimeUser);
+        fileStorageMock.when(FileStorage::loadUsers)
+                .thenReturn(List.of(u1, u2));
 
-        try (MockedStatic<FileStorage> mock = Mockito.mockStatic(FileStorage.class)) {
-            mock.when(FileStorage::loadUsers).thenReturn(users);
+        reminderService.sendLateReturnReminders();
 
-            reminder.sendLateReturnReminders();
-
-            verify(emailMock, times(1))
-                    .send(eq("fatima@gmail.com"), eq("Late Book Reminder"), anyString());
-
-            verify(emailMock, never())
-                    .send(eq("mona@gmail.com"), anyString(), anyString());
-        }
+        verify(emailService, times(2)).send(any(), any(), any());
     }
 }

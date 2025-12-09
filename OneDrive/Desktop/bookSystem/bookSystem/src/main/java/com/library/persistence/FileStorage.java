@@ -5,24 +5,38 @@ import com.library.domain.BorrowRecord;
 import com.library.domain.User;
 
 import java.io.*;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
 
 public class FileStorage {
 
-    private static String USER_FILE = "users.txt";
-    private static String BOOKS_FILE = "books.txt";
-
-    // ----------- Setters to override paths for testing --------------
-    public static void setUserFile(String path) {
-        USER_FILE = path;
+    // ===========================
+    //  RESOURCE FILE RESOLVER
+    // ===========================
+    private static String getResourcePath(String filename) {
+        try {
+            URL resource = FileStorage.class.getClassLoader().getResource(filename);
+            if (resource == null) {
+                throw new RuntimeException("Resource not found: " + filename);
+            }
+            return new File(resource.toURI()).getAbsolutePath();
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot load resource: " + filename + " -> " + e.getMessage());
+        }
     }
 
-    public static void setBooksFile(String path) {
-        BOOKS_FILE = path;
-    }
+    // default files (inside resources)
+    private static String USER_FILE = getResourcePath("users.txt");
+    private static String BOOKS_FILE = getResourcePath("books.txt");
 
-    // ------------------ LOAD USERS ----------------------
+    // allow tests to override files
+    public static void setUserFile(String path) { USER_FILE = path; }
+    public static void setBooksFile(String path) { BOOKS_FILE = path; }
+
+    // ===========================
+    //        LOAD USERS
+    // ===========================
     public static List<User> loadUsers() {
         List<User> users = new ArrayList<>();
         File f = new File(USER_FILE);
@@ -50,6 +64,7 @@ public class FileStorage {
                 User u = new User(username, email, password, role);
                 u.setFine(fine);
 
+                // load borrowed record line
                 String borrowedLine = br.readLine();
                 List<BorrowRecord> recs = new ArrayList<>();
 
@@ -72,12 +87,16 @@ public class FileStorage {
                 u.setBorrowedBooks(recs);
                 users.add(u);
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return users;
     }
 
-    // ------------------- SAVE USERS ----------------------
+    // ===========================
+    //       SAVE USERS
+    // ===========================
     public static void saveUsers(List<User> users) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(USER_FILE))) {
             for (User u : users) {
@@ -100,7 +119,6 @@ public class FileStorage {
                                 .append(r.getType()).append("|")
                                 .append(r.getBorrowDate()).append("|")
                                 .append(r.getDeadline()).append(";");
-
                     }
                     pw.println("borrowed=" + sb);
                 }
@@ -108,7 +126,9 @@ public class FileStorage {
         } catch (IOException e) { e.printStackTrace(); }
     }
 
-    // -------------------- FIND USER -----------------------
+    // ===========================
+    // FIND USER
+    // ===========================
     public static User findUserByEmail(String email) {
         for (User u : loadUsers()) {
             if (u.getEmail().equalsIgnoreCase(email)) return u;
@@ -116,7 +136,9 @@ public class FileStorage {
         return null;
     }
 
-    // -------------------- UPDATE USER ---------------------
+    // ===========================
+    // UPDATE USER
+    // ===========================
     public static void updateUser(User updated) {
         List<User> users = loadUsers();
 
@@ -129,21 +151,9 @@ public class FileStorage {
         saveUsers(users);
     }
 
-    // ------------------- ADD BOOK -------------------------
-    public static void addBook(Book b) {
-        List<Book> books = loadBooks();
-        books.add(b);
-        updateBooksFile(books);
-    }
-
-    // ------------------- REMOVE USER -----------------------
-    public static void removeUserByEmail(String email) {
-        List<User> users = loadUsers();
-        users.removeIf(u -> u.getEmail().equalsIgnoreCase(email));
-        saveUsers(users);
-    }
-
-    // -------------------- LOAD BOOKS -----------------------
+    // ===========================
+    // LOAD BOOKS
+    // ===========================
     public static List<Book> loadBooks() {
         List<Book> books = new ArrayList<>();
 
@@ -151,7 +161,6 @@ public class FileStorage {
         if (!f.exists()) return books;
 
         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-
             String line;
             while ((line = br.readLine()) != null) {
                 String[] p = line.split(",", -1);
@@ -169,7 +178,9 @@ public class FileStorage {
         return books;
     }
 
-    // ---------------- SAVE BOOKS --------------------------
+    // ===========================
+    // SAVE BOOKS
+    // ===========================
     public static void updateBooksFile(List<Book> books) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(BOOKS_FILE))) {
             for (Book b : books) {
@@ -184,7 +195,9 @@ public class FileStorage {
         } catch (IOException e) { e.printStackTrace(); }
     }
 
-    // ------------------ PERFORM BORROW ---------------------
+    // ===========================
+    //   BORROW / RETURN
+    // ===========================
     public static void performBorrow(String email, Book book) {
 
         LocalDate now = LocalDate.now();
@@ -212,7 +225,6 @@ public class FileStorage {
         updateBooksFile(books);
     }
 
-    // ------------------ PERFORM RETURN ---------------------
     public static void performReturn(String email, BorrowRecord rec) {
 
         removeBorrowFromUser(email, rec);
@@ -229,7 +241,6 @@ public class FileStorage {
         updateBooksFile(books);
     }
 
-    // ---------------- ADD BORROW ---------------------------
     private static void addBorrowToUser(String email, BorrowRecord rec) {
         List<User> users = loadUsers();
 
@@ -245,7 +256,6 @@ public class FileStorage {
         saveUsers(users);
     }
 
-    // ---------------- REMOVE BORROW ------------------------
     private static void removeBorrowFromUser(String email, BorrowRecord rec) {
         List<User> users = loadUsers();
 
@@ -264,8 +274,7 @@ public class FileStorage {
 
         saveUsers(users);
     }
-
-	public static String getUserFile() {
+	public static Object addBook(Book any) {
 		// TODO Auto-generated method stub
 		return null;
 	}

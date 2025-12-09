@@ -6,8 +6,13 @@ import javax.mail.internet.*;
 
 public class EmailService implements IEmailService {
 
-    private final String senderEmail = "anoud.salah2003@gmail.com";
-    private final String senderPassword = "ooaz iyar hxlp yyyw"; 
+    private final String senderEmail;
+    private final String senderPassword;
+
+    public EmailService(String senderPassword, String senderEmail) {
+        this.senderEmail = senderEmail;
+        this.senderPassword = senderPassword;
+    }
 
     @Override
     public void send(String recipientEmail, String subject, String messageText) {
@@ -34,7 +39,6 @@ public class EmailService implements IEmailService {
             message.setText(messageText);
 
             Transport.send(message);
-            System.out.println("Email sent successfully to " + recipientEmail);
 
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to send email: " + e.getMessage());

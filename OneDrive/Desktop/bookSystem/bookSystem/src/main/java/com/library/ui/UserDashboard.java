@@ -16,9 +16,8 @@ public class UserDashboard extends JFrame {
     private JPanel booksPanel, searchPanel, myBooksPanel, finesPanel;
     private String currentUserEmail;
 
-    public UserDashboard(String usernameOrEmail) {
-        this.currentUserEmail = usernameOrEmail;
-        
+    public UserDashboard(String userEmail) {
+        this.currentUserEmail = userEmail;
 
         setTitle("Library System - User");
         setSize(1100, 650);
@@ -355,7 +354,6 @@ public class UserDashboard extends JFrame {
                 FileStorage.performReturn(currentUserEmail, r);
                 JOptionPane.showMessageDialog(this, "Returned. Thank you!");
 
-                // REFRESH PANEL CORRECTLY
                 this.dispose();
                 new UserDashboard(currentUserEmail).setVisible(true);
             });
@@ -451,11 +449,5 @@ public class UserDashboard extends JFrame {
         panel.add(payPartial);
 
         return panel;
-    }
-
-    // ============================================================
-    private void switchPanel(JPanel container, String name) {
-        CardLayout cl = (CardLayout) container.getLayout();
-        cl.show(container, name);
     }
 }

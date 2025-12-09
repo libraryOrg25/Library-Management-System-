@@ -1,0 +1,8 @@
+fatima,fatima@mail.com,1234,user,0
+borrowed=
+any,fatima@gmail.com,1234,user,0
+borrowed=
+newUser,new@gmail.com,pass,user,0
+borrowed=
+roaa,roaa@hotmail.com,123456789,user,0
+borrowed=123|54654|Book|2025-12-02|2025-12-30;harry potter|12365|Book|2025-12-02|2025-12-30;Harry Potter|1234|Book|2025-12-02|2025-12-30;Friends|469523|Book|2025-12-02|2025-12-30;

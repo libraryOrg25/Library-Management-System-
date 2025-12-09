@@ -1,61 +1,73 @@
 package com.library.service;
 
 import com.library.domain.BorrowRecord;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FineServiceTest {
+class FineServiceTest {
 
-    private FineService fs;
+    private final FineService fineService = new FineService();
 
-    @BeforeEach
-    void setup() {
-        fs = new FineService();
+    @Test
+    void testNoLateFine() {
+        BorrowRecord r = new BorrowRecord(
+                "Book A", "111", "book",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 10)
+        );
+
+        int fine = fineService.calculateItemFine(r, LocalDate.of(2025, 1, 9));
+        assertEquals(0, fine);
     }
 
     @Test
-    void testBookFine() {
-
-        LocalDate today = LocalDate.now();
-
+    void testBookLateFine() {
         BorrowRecord r = new BorrowRecord(
-                "Java", "11", "Book",
-                today.minusDays(10),
-                today.minusDays(5)
+                "Book B", "222", "book",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 10)
         );
 
-        // 5 days late → 5 * 10 = 50
-        assertEquals(50, fs.calculateItemFine(r, today));
+        int fine = fineService.calculateItemFine(r, LocalDate.of(2025, 1, 12));
+        assertEquals(20, fine); // 2 days * 10
     }
 
     @Test
-    void testCDFine() {
-
-        LocalDate today = LocalDate.now();
-
+    void testCDLateFine() {
         BorrowRecord r = new BorrowRecord(
-                "Music", "22", "CD",
-                today.minusDays(15),
-                today.minusDays(3)
+                "Music CD", "333", "CD",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 10)
         );
 
-        // 3 days late → 3 * 20 = 60
-        assertEquals(60, fs.calculateItemFine(r, today));
+        int fine = fineService.calculateItemFine(r, LocalDate.of(2025, 1, 15));
+        assertEquals(100, fine); // 5 days * 20
     }
 
     @Test
-    void testNoFine() {
-
-        LocalDate today = LocalDate.now();
-
+    void testTodayBeforeDeadline() {
         BorrowRecord r = new BorrowRecord(
-                "Clean Code", "33", "Book",
-                today,
-                today.plusDays(8)
+                "Book C", "444", "BOOK",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 2, 1)
         );
 
-        // Not late
-        assertEquals(0, fs.calculateItemFine(r, today));
+        int fine = fineService.calculateItemFine(r, LocalDate.of(2025, 1, 20));
+        assertEquals(0, fine);
+    }
+
+    @Test
+    void testCaseInsensitiveType() {
+        BorrowRecord r = new BorrowRecord(
+                "CD test", "555", "cD",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 10)
+        );
+
+        int fine = fineService.calculateItemFine(r, LocalDate.of(2025, 1, 12));
+        assertEquals(40, fine);
     }
 }

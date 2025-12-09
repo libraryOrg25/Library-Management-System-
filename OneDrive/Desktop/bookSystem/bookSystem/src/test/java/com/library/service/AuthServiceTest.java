@@ -1,58 +1,88 @@
 package com.library.service;
 
-import com.library.persistence.FileStorage;
 import com.library.domain.User;
+import com.library.persistence.FileStorage;
 import org.junit.jupiter.api.*;
-import java.nio.file.*;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-public class AuthServiceTest {
+class AuthServiceTest {
 
-    private Path tempUsers;
+    private AuthService authService;
+    private MockedStatic<FileStorage> mockedStatic;
 
     @BeforeEach
-    void setup() throws Exception {
-        tempUsers = Files.createTempFile("users_test", ".txt");
-        FileStorage.setUserFile(tempUsers.toString());
-
-        Files.write(tempUsers, Arrays.asList(
-                "fatima,f@gmail.com,1234,user,0",
-                "borrowed="
-        ));
+    void setUp() {
+        authService = new AuthService();
+        mockedStatic = Mockito.mockStatic(FileStorage.class);
     }
 
-    @Test
-    void testRegisterEmailExists() {
-        AuthService auth = new AuthService();
-        boolean result = auth.register("new", "f@gmail.com", "9999", "user");
-        assertFalse(result);
+    @AfterEach
+    void tearDown() {
+        mockedStatic.close();
     }
 
     @Test
     void testRegisterSuccess() {
-        AuthService auth = new AuthService();
-        boolean result = auth.register("lana", "lana@mail.com", "1111", "user");
+        List<User> emptyList = new ArrayList<>();
+
+        mockedStatic.when(FileStorage::loadUsers).thenReturn(emptyList);
+
+        boolean result = authService.register("Fatima", "fatima@test.com", "12345", "user");
+
         assertTrue(result);
 
-        User u = FileStorage.findUserByEmail("lana@mail.com");
-        assertNotNull(u);
+        mockedStatic.verify(() -> FileStorage.saveUsers(anyList()));
+    }
+
+    @Test
+    void testRegisterFailsWhenEmailExists() {
+        List<User> users = new ArrayList<>();
+        users.add(new User("Ali", "ali@test.com", "abc", "user"));
+
+        mockedStatic.when(FileStorage::loadUsers).thenReturn(users);
+
+        boolean result = authService.register("NewUser", "ali@test.com", "pass", "user");
+
+        assertFalse(result);
+
+        mockedStatic.verify(() -> FileStorage.saveUsers(anyList()), never());
     }
 
     @Test
     void testLoginSuccess() {
-        AuthService auth = new AuthService();
-        User u = auth.login("f@gmail.com", "1234");
+        User u = new User("Layan", "layan@test.com", "pass123", "admin");
 
-        assertNotNull(u);
-        assertEquals("fatima", u.getUsername());
+        mockedStatic.when(FileStorage::loadUsers).thenReturn(List.of(u));
+
+        User logged = authService.login("layan@test.com", "pass123");
+
+        assertNotNull(logged);
+        assertEquals("Layan", logged.getUsername());
     }
 
     @Test
-    void testLoginFail() {
-        AuthService auth = new AuthService();
-        User u = auth.login("x@mail.com", "wrong");
-        assertNull(u);
+    void testLoginFailsWrongPassword() {
+        User u = new User("Sara", "sara@test.com", "mypassword", "user");
+
+        mockedStatic.when(FileStorage::loadUsers).thenReturn(List.of(u));
+
+        User result = authService.login("sara@test.com", "wrong");
+
+        assertNull(result);
+    }
+
+    @Test
+    void testLoginFailsEmailNotFound() {
+        mockedStatic.when(FileStorage::loadUsers).thenReturn(Collections.emptyList());
+
+        User result = authService.login("unknown@test.com", "123");
+
+        assertNull(result);
     }
 }

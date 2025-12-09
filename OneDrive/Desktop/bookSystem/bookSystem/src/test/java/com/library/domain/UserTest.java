@@ -1,40 +1,61 @@
 package com.library.domain;
 
 import org.junit.jupiter.api.Test;
-import java.util.*;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserTest {
+class UserTest {
 
     @Test
-    void testUserFields() {
-        User u = new User("fatima", "fatima@gmail.com", "1234", "user");
+    void testConstructorAndGetters() {
+        User u = new User("Fatima", "fatima@test.com", "1234", "admin");
 
-        assertEquals("fatima", u.getUsername());
-        assertEquals("fatima@gmail.com", u.getEmail());
+        assertEquals("Fatima", u.getUsername());
+        assertEquals("fatima@test.com", u.getEmail());
         assertEquals("1234", u.getPassword());
-        assertEquals("user", u.getRole());
+        assertEquals("admin", u.getRole());
         assertEquals(0, u.getFine());
+        assertNotNull(u.getBorrowedBooks());
+        assertTrue(u.getBorrowedBooks().isEmpty());
     }
 
     @Test
     void testSetFine() {
-        User u = new User("a", "b", "c", "user");
-        u.setFine(20);
-        assertEquals(20, u.getFine());
+        User u = new User("F", "e", "p", "user");
+        u.setFine(50);
+        assertEquals(50, u.getFine());
     }
 
     @Test
-    void testBorrowedBooksList() {
-        User u = new User("x", "x@gmail.com", "1", "user");
+    void testSetBorrowedBooks() {
+        User u = new User("F", "e", "p", "user");
 
-        BorrowRecord r = new BorrowRecord("Java", "111", "BOOK",
-                java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(1));
+        List<BorrowRecord> list = new ArrayList<>();
+        list.add(new BorrowRecord(
+                "Java Book",
+                "111",
+                "BOOK",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 10)
+        ));
 
-        u.setBorrowedBooks(Arrays.asList(r));
+        u.setBorrowedBooks(list);
 
         assertEquals(1, u.getBorrowedBooks().size());
-        assertEquals("Java", u.getBorrowedBooks().get(0).getBookTitle());
+        assertEquals("Java Book", u.getBorrowedBooks().get(0).getBookTitle());
+    }
+
+    @Test
+    void testSetPasswordDoesNothing() {
+        User u = new User("F", "e", "1234", "user");
+
+        u.setPassword("newpass");
+
+        // method is empty so password MUST remain unchanged
+        assertEquals("1234", u.getPassword());
     }
 }

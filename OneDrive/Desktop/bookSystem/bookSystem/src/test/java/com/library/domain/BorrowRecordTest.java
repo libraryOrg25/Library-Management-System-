@@ -5,19 +5,25 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BorrowRecordTest {
+class BorrowRecordTest {
 
     @Test
-    void testBorrowRecordFields() {
-        LocalDate d1 = LocalDate.of(2024,1,1);
-        LocalDate d2 = LocalDate.of(2024,1,10);
+    void testConstructorAndGetters() {
+        LocalDate borrowDate = LocalDate.of(2025, 1, 1);
+        LocalDate deadline = LocalDate.of(2025, 1, 10);
 
-        BorrowRecord r = new BorrowRecord("Java", "1111", "BOOK", d1, d2);
+        BorrowRecord record = new BorrowRecord(
+                "Java Programming",
+                "ISBN123",
+                "BOOK",
+                borrowDate,
+                deadline
+        );
 
-        assertEquals("Java", r.getBookTitle());
-        assertEquals("1111", r.getIsbn());
-        assertEquals("BOOK", r.getType());
-        assertEquals(d1, r.getBorrowDate());
-        assertEquals(d2, r.getDeadline());
+        assertEquals("Java Programming", record.getBookTitle());
+        assertEquals("ISBN123", record.getIsbn());
+        assertEquals("BOOK", record.getType());
+        assertEquals(borrowDate, record.getBorrowDate());
+        assertEquals(deadline, record.getDeadline());
     }
 }

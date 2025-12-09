@@ -1,4 +1,6 @@
 package com.library.ui;
+import com.library.service.AuthService;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +16,7 @@ public class RegisterUI extends JFrame {
     protected AuthService authService;
 
     // ============= Inject-able AuthService for testing =================
-    protected AuthService createAuthService() {
+    public AuthService createAuthService() {
         return new AuthService();
     }
 
