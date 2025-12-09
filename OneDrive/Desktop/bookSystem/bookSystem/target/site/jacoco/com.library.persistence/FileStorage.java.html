@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileStorage.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">books</a> &gt; <a href="index.source.html" class="el_package">com.library.persistence</a> &gt; <span class="el_source">FileStorage.java</span></div><h1>FileStorage.java</h1><pre class="source lang-java linenums">package com.library.persistence;
+
+import com.library.domain.Book;
+import com.library.domain.BorrowRecord;
+import com.library.domain.User;
+
+import java.io.*;
+import java.net.URL;
+import java.time.LocalDate;
+import java.util.*;
+
+<span class="nc" id="L12">public class FileStorage {</span>
+
+    // ===========================
+    //  RESOURCE FILE RESOLVER
+    // ===========================
+    private static String getResourcePath(String filename) {
+        try {
+<span class="fc" id="L19">            URL resource = FileStorage.class.getClassLoader().getResource(filename);</span>
+<span class="pc bpc" id="L20" title="1 of 2 branches missed.">            if (resource == null) {</span>
+<span class="nc" id="L21">                throw new RuntimeException(&quot;Resource not found: &quot; + filename);</span>
+            }
+<span class="fc" id="L23">            return new File(resource.toURI()).getAbsolutePath();</span>
+<span class="nc" id="L24">        } catch (Exception e) {</span>
+<span class="nc" id="L25">            throw new RuntimeException(&quot;Cannot load resource: &quot; + filename + &quot; -&gt; &quot; + e.getMessage());</span>
+        }
+    }
+
+    // default files (inside resources)
+<span class="fc" id="L30">    private static String USER_FILE = getResourcePath(&quot;users.txt&quot;);</span>
+<span class="fc" id="L31">    private static String BOOKS_FILE = getResourcePath(&quot;books.txt&quot;);</span>
+
+    // allow tests to override files
+<span class="fc" id="L34">    public static void setUserFile(String path) { USER_FILE = path; }</span>
+<span class="fc" id="L35">    public static void setBooksFile(String path) { BOOKS_FILE = path; }</span>
+
+    // ===========================
+    //        LOAD USERS
+    // ===========================
+    public static List&lt;User&gt; loadUsers() {
+<span class="fc" id="L41">        List&lt;User&gt; users = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L42">        File f = new File(USER_FILE);</span>
+<span class="pc bpc" id="L43" title="1 of 2 branches missed.">        if (!f.exists()) return users;</span>
+
+<span class="fc" id="L45">        try (BufferedReader br = new BufferedReader(new FileReader(f))) {</span>
+            String meta;
+<span class="fc bfc" id="L47" title="All 2 branches covered.">            while ((meta = br.readLine()) != null) {</span>
+
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">                if (meta.trim().isEmpty()) continue;</span>
+
+<span class="fc" id="L51">                String[] parts = meta.split(&quot;,&quot;, -1);</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">                if (parts.length &lt; 4) continue;</span>
+
+<span class="fc" id="L54">                String username = parts[0];</span>
+<span class="fc" id="L55">                String email = parts[1];</span>
+<span class="fc" id="L56">                String password = parts[2];</span>
+<span class="fc" id="L57">                String role = parts[3];</span>
+
+<span class="fc" id="L59">                int fine = 0;</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">                if (parts.length &gt;= 5) {</span>
+<span class="pc" id="L61">                    try { fine = Integer.parseInt(parts[4]); } catch (Exception ignored) {}</span>
+                }
+
+<span class="fc" id="L64">                User u = new User(username, email, password, role);</span>
+<span class="fc" id="L65">                u.setFine(fine);</span>
+
+                // load borrowed record line
+<span class="fc" id="L68">                String borrowedLine = br.readLine();</span>
+<span class="fc" id="L69">                List&lt;BorrowRecord&gt; recs = new ArrayList&lt;&gt;();</span>
+
+<span class="pc bpc" id="L71" title="2 of 4 branches missed.">                if (borrowedLine != null &amp;&amp; borrowedLine.startsWith(&quot;borrowed=&quot;)) {</span>
+<span class="fc" id="L72">                    String val = borrowedLine.substring(&quot;borrowed=&quot;.length());</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">                    if (!val.isEmpty()) {</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">                        for (String it : val.split(&quot;;&quot;)) {</span>
+<span class="fc" id="L75">                            String[] b = it.split(&quot;\\|&quot;);</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">                            if (b.length == 5) {</span>
+<span class="fc" id="L77">                                recs.add(new BorrowRecord(</span>
+<span class="fc" id="L78">                                        b[0], b[1], b[2],</span>
+<span class="fc" id="L79">                                        LocalDate.parse(b[3]),</span>
+<span class="fc" id="L80">                                        LocalDate.parse(b[4])</span>
+                                ));
+                            }
+                        }
+                    }
+                }
+
+<span class="fc" id="L87">                u.setBorrowedBooks(recs);</span>
+<span class="fc" id="L88">                users.add(u);</span>
+            }
+<span class="nc" id="L90">        } catch (IOException e) {</span>
+<span class="nc" id="L91">            e.printStackTrace();</span>
+        }
+
+<span class="fc" id="L94">        return users;</span>
+    }
+
+    // ===========================
+    //       SAVE USERS
+    // ===========================
+    public static void saveUsers(List&lt;User&gt; users) {
+<span class="fc" id="L101">        try (PrintWriter pw = new PrintWriter(new FileWriter(USER_FILE))) {</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">            for (User u : users) {</span>
+
+<span class="fc" id="L104">                pw.println(String.join(&quot;,&quot;,</span>
+<span class="fc" id="L105">                        u.getUsername(),</span>
+<span class="fc" id="L106">                        u.getEmail(),</span>
+<span class="fc" id="L107">                        u.getPassword(),</span>
+<span class="fc" id="L108">                        u.getRole(),</span>
+<span class="fc" id="L109">                        &quot;&quot; + u.getFine()</span>
+                ));
+
+<span class="pc bpc" id="L112" title="1 of 4 branches missed.">                if (u.getBorrowedBooks() == null || u.getBorrowedBooks().isEmpty()) {</span>
+<span class="fc" id="L113">                    pw.println(&quot;borrowed=&quot;);</span>
+<span class="fc" id="L114">                } else {</span>
+<span class="fc" id="L115">                    StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">                    for (BorrowRecord r : u.getBorrowedBooks()) {</span>
+<span class="fc" id="L117">                        sb.append(r.getBookTitle()).append(&quot;|&quot;)</span>
+<span class="fc" id="L118">                                .append(r.getIsbn()).append(&quot;|&quot;)</span>
+<span class="fc" id="L119">                                .append(r.getType()).append(&quot;|&quot;)</span>
+<span class="fc" id="L120">                                .append(r.getBorrowDate()).append(&quot;|&quot;)</span>
+<span class="fc" id="L121">                                .append(r.getDeadline()).append(&quot;;&quot;);</span>
+                    }
+<span class="fc" id="L123">                    pw.println(&quot;borrowed=&quot; + sb);</span>
+                }
+            }
+<span class="nc" id="L126">        } catch (IOException e) { e.printStackTrace(); }</span>
+<span class="fc" id="L127">    }</span>
+
+    // ===========================
+    // FIND USER
+    // ===========================
+    public static User findUserByEmail(String email) {
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        for (User u : loadUsers()) {</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">            if (u.getEmail().equalsIgnoreCase(email)) return u;</span>
+        }
+<span class="fc" id="L136">        return null;</span>
+    }
+
+    // ===========================
+    // UPDATE USER
+    // ===========================
+    public static void updateUser(User updated) {
+<span class="fc" id="L143">        List&lt;User&gt; users = loadUsers();</span>
+
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">        for (int i = 0; i &lt; users.size(); i++) {</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">            if (users.get(i).getEmail().equalsIgnoreCase(updated.getEmail())) {</span>
+<span class="fc" id="L147">                users.set(i, updated);</span>
+<span class="fc" id="L148">                break;</span>
+            }
+        }
+<span class="fc" id="L151">        saveUsers(users);</span>
+<span class="fc" id="L152">    }</span>
+
+    // ===========================
+    // LOAD BOOKS
+    // ===========================
+    public static List&lt;Book&gt; loadBooks() {
+<span class="fc" id="L158">        List&lt;Book&gt; books = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L160">        File f = new File(BOOKS_FILE);</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">        if (!f.exists()) return books;</span>
+
+<span class="fc" id="L163">        try (BufferedReader br = new BufferedReader(new FileReader(f))) {</span>
+            String line;
+<span class="fc bfc" id="L165" title="All 2 branches covered.">            while ((line = br.readLine()) != null) {</span>
+<span class="fc" id="L166">                String[] p = line.split(&quot;,&quot;, -1);</span>
+
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">                if (p.length == 5) {</span>
+<span class="fc" id="L169">                    books.add(new Book(</span>
+<span class="fc" id="L170">                            p[0], p[1], p[2], p[3],</span>
+<span class="fc" id="L171">                            Integer.parseInt(p[4])</span>
+                    ));
+                }
+            }
+
+<span class="nc" id="L176">        } catch (IOException e) { e.printStackTrace(); }</span>
+
+<span class="fc" id="L178">        return books;</span>
+    }
+
+    // ===========================
+    // SAVE BOOKS
+    // ===========================
+    public static void updateBooksFile(List&lt;Book&gt; books) {
+<span class="fc" id="L185">        try (PrintWriter pw = new PrintWriter(new FileWriter(BOOKS_FILE))) {</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">            for (Book b : books) {</span>
+<span class="fc" id="L187">                pw.println(String.join(&quot;,&quot;,</span>
+<span class="fc" id="L188">                        b.getTitle(),</span>
+<span class="fc" id="L189">                        b.getAuthor(),</span>
+<span class="fc" id="L190">                        b.getIsbn(),</span>
+<span class="fc" id="L191">                        b.getType(),</span>
+<span class="fc" id="L192">                        &quot;&quot; + b.getCopies()</span>
+                ));
+            }
+<span class="nc" id="L195">        } catch (IOException e) { e.printStackTrace(); }</span>
+<span class="fc" id="L196">    }</span>
+
+    // ===========================
+    //   BORROW / RETURN
+    // ===========================
+    public static void performBorrow(String email, Book book) {
+
+<span class="fc" id="L203">        LocalDate now = LocalDate.now();</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">        int days = book.getType().equalsIgnoreCase(&quot;CD&quot;) ? 7 : 28;</span>
+
+<span class="fc" id="L206">        BorrowRecord rec = new BorrowRecord(</span>
+<span class="fc" id="L207">                book.getTitle(),</span>
+<span class="fc" id="L208">                book.getIsbn(),</span>
+<span class="fc" id="L209">                book.getType(),</span>
+<span class="fc" id="L210">                now,</span>
+<span class="fc" id="L211">                now.plusDays(days)</span>
+        );
+
+<span class="fc" id="L214">        addBorrowToUser(email, rec);</span>
+
+<span class="fc" id="L216">        List&lt;Book&gt; books = loadBooks();</span>
+
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">        for (Book b : books) {</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">            if (b.getIsbn().equalsIgnoreCase(book.getIsbn())) {</span>
+<span class="fc" id="L220">                b.setCopies(b.getCopies() - 1);</span>
+<span class="fc" id="L221">                break;</span>
+            }
+        }
+
+<span class="fc" id="L225">        updateBooksFile(books);</span>
+<span class="fc" id="L226">    }</span>
+
+    public static void performReturn(String email, BorrowRecord rec) {
+
+<span class="fc" id="L230">        removeBorrowFromUser(email, rec);</span>
+
+<span class="fc" id="L232">        List&lt;Book&gt; books = loadBooks();</span>
+
+<span class="fc bfc" id="L234" title="All 2 branches covered.">        for (Book b : books) {</span>
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">            if (b.getIsbn().equalsIgnoreCase(rec.getIsbn())) {</span>
+<span class="fc" id="L236">                b.setCopies(b.getCopies() + 1);</span>
+<span class="fc" id="L237">                break;</span>
+            }
+        }
+
+<span class="fc" id="L241">        updateBooksFile(books);</span>
+<span class="fc" id="L242">    }</span>
+
+    private static void addBorrowToUser(String email, BorrowRecord rec) {
+<span class="fc" id="L245">        List&lt;User&gt; users = loadUsers();</span>
+
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">        for (User u : users) {</span>
+<span class="pc bpc" id="L248" title="1 of 2 branches missed.">            if (u.getEmail().equalsIgnoreCase(email)) {</span>
+<span class="pc bpc" id="L249" title="1 of 2 branches missed.">                if (u.getBorrowedBooks() == null)</span>
+<span class="nc" id="L250">                    u.setBorrowedBooks(new ArrayList&lt;&gt;());</span>
+
+<span class="fc" id="L252">                u.getBorrowedBooks().add(rec);</span>
+<span class="fc" id="L253">                break;</span>
+            }
+        }
+<span class="fc" id="L256">        saveUsers(users);</span>
+<span class="fc" id="L257">    }</span>
+
+    private static void removeBorrowFromUser(String email, BorrowRecord rec) {
+<span class="fc" id="L260">        List&lt;User&gt; users = loadUsers();</span>
+
+<span class="pc bpc" id="L262" title="1 of 2 branches missed.">        for (User u : users) {</span>
+<span class="pc bpc" id="L263" title="1 of 2 branches missed.">            if (u.getEmail().equalsIgnoreCase(email)) {</span>
+
+<span class="pc bpc" id="L265" title="1 of 2 branches missed.">                if (u.getBorrowedBooks() != null) {</span>
+<span class="fc" id="L266">                    u.getBorrowedBooks().removeIf(r -&gt;</span>
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">                            r.getIsbn().equals(rec.getIsbn()) &amp;&amp;</span>
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">                            r.getBookTitle().equals(rec.getBookTitle())</span>
+                    );
+                }
+<span class="fc" id="L271">                break;</span>
+            }
+        }
+
+<span class="fc" id="L275">        saveUsers(users);</span>
+<span class="fc" id="L276">    }</span>
+	public static Object addBook(Book any) {
+		// TODO Auto-generated method stub
+<span class="nc" id="L279">		return null;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

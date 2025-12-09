@@ -1,0 +1,9 @@
+com\library\persistence\FileStorageTest.class
+com\library\service\FineServiceTest.class
+com\library\domain\BorrowRecordTest.class
+com\library\service\AuthServiceTest.class
+com\library\service\ReminderServiceTest.class
+com\library\domain\BookTest.class
+com\library\domain\UserTest.class
+com\library\service\EmailServiceTest.class
+com\library\service\IEmailServiceTest.class

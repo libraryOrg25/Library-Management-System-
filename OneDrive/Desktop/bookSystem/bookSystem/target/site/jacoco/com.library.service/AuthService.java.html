@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">books</a> &gt; <a href="index.source.html" class="el_package">com.library.service</a> &gt; <span class="el_source">AuthService.java</span></div><h1>AuthService.java</h1><pre class="source lang-java linenums">package com.library.service;
+
+import java.util.*;
+import com.library.domain.User;
+import com.library.persistence.FileStorage;
+
+public class AuthService {
+
+<span class="fc" id="L9">    public AuthService() {</span>
+        // intentionally empty – we no longer cache users here
+<span class="fc" id="L11">    }</span>
+
+    /**
+     * Always reload fresh users from storage
+     */
+    private List&lt;User&gt; loadUsersFresh() {
+<span class="fc" id="L17">        return FileStorage.loadUsers();</span>
+    }
+
+    /**
+     * Register new user
+     */
+    public boolean register(String username, String email, String password, String role) {
+
+<span class="fc" id="L25">        List&lt;User&gt; users = loadUsersFresh();</span>
+
+        // check if email already exists
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        for (User u : users) {</span>
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">            if (u.getEmail().equalsIgnoreCase(email)) {</span>
+<span class="fc" id="L30">                return false;</span>
+            }
+        }
+
+        // add new user
+<span class="fc" id="L35">        users.add(new User(username, email, password, role));</span>
+
+        // save updated list
+<span class="fc" id="L38">        FileStorage.saveUsers(users);</span>
+
+<span class="fc" id="L40">        return true;</span>
+    }
+
+    /**
+     * Login user
+     */
+    public User login(String email, String password) {
+
+<span class="fc" id="L48">        List&lt;User&gt; users = loadUsersFresh();</span>
+
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        for (User u : users) {</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">            if (u.getEmail().equalsIgnoreCase(email) &amp;&amp;</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">                u.getPassword().equals(password)) {</span>
+<span class="fc" id="L53">                return u;</span>
+            }
+        }
+
+<span class="fc" id="L57">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

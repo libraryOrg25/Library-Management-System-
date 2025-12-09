@@ -1,0 +1,13 @@
+# Ignore target folder
+/target/
+
+# Ignore IDE and system files
+/.settings/
+/.classpath
+.project
+
+# Ignore everything else except src and pom.xml
+/*
+!.gitignore
+!/src/
+!/pom.xml
