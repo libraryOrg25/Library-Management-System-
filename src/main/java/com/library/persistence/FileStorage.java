@@ -26,7 +26,7 @@ public class FileStorage {
     private static String USER_FILE = getResourcePath("users.txt");
     private static String BOOKS_FILE = getResourcePath("books.txt");
     private static final String BORROWED_PREFIX = "borrowed=";
-
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(FileStorage.class.getName());
 
     public static void setUserFile(String path) { USER_FILE = path; }
     public static void setBooksFile(String path) { BOOKS_FILE = path; }
@@ -82,15 +82,18 @@ public class FileStorage {
                 users.add(u);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+        	LOGGER.severe("Failed to load users: " + e.getMessage());
         }
 
         return users;
     }
-
-    // ===========================
-    //       SAVE USERS
-    // ===========================
+ 
+    
+    
+    
+    
+    
+       
     public static void saveUsers(List<User> users) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(USER_FILE))) {
             for (User u : users) {
@@ -117,7 +120,7 @@ public class FileStorage {
                     pw.println(BORROWED_PREFIX + sb);
                 }
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {LOGGER.severe("Failed to update books file: " + e.getMessage()); }
     }
 
     // ===========================
@@ -167,8 +170,10 @@ public class FileStorage {
                 }
             }
 
-        } catch (IOException e) { e.printStackTrace(); }
-
+        } 
+        catch (IOException e) {
+            LOGGER.severe("Failed to load books: " + e.getMessage());
+        }
         return books;
     }
 
@@ -186,7 +191,13 @@ public class FileStorage {
                         "" + b.getCopies()
                 ));
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } 
+        catch (IOException e) {
+            LOGGER.severe("Failed to update books file: " + e.getMessage());
+        }
+        
+        
+          
     }
 
     // ===========================
