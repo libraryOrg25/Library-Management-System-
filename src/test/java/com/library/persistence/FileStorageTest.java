@@ -151,4 +151,79 @@ public class FileStorageTest {
         List<Book> books = FileStorage.loadBooks();
         assertEquals(2, books.get(0).getCopies()); // incremented by 1
     }
+
+    // ---------------------------------------------------------
+    // EXTRA TESTS TO INCREASE BRANCH COVERAGE
+    // ---------------------------------------------------------
+
+    // empty users file
+    @Test
+    @Order(7)
+    void testLoadUsersEmptyFile() throws Exception {
+        Files.write(tempUsers, "".getBytes());
+        List<User> users = FileStorage.loadUsers();
+        assertEquals(0, users.size());
+    }
+
+    // invalid user line
+    @Test
+    @Order(8)
+    void testLoadUsersInvalidLine() throws Exception {
+        String bad = "bad,data,line\nborrowed=\n";
+        Files.write(tempUsers, bad.getBytes());
+        List<User> users = FileStorage.loadUsers();
+        assertEquals(0, users.size());
+    }
+
+    // updateBooksFile with empty list
+    @Test
+    @Order(9)
+    void testUpdateBooksFileEmpty() {
+        FileStorage.updateBooksFile(List.of());
+        List<Book> books = FileStorage.loadBooks();
+        assertEquals(0, books.size());
+    }
+
+    // performReturn when book NOT found
+    @Test
+    @Order(10)
+    void testPerformReturnBookNotFound() {
+
+        User u = new User("X", "x@mail.com", "111", "user");
+        BorrowRecord rec = new BorrowRecord("BookX", "000", "BOOK",
+                LocalDate.now(), LocalDate.now().plusDays(5));
+        u.getBorrowedBooks().add(rec);
+
+        FileStorage.saveUsers(List.of(u));
+
+        // no books in file
+        FileStorage.updateBooksFile(List.of());
+
+        FileStorage.performReturn("x@mail.com", rec);
+
+        List<Book> after = FileStorage.loadBooks();
+        assertEquals(0, after.size());
+    }
+
+    // removeBorrow when no match exists
+    @Test
+    @Order(11)
+    void testRemoveBorrowNoMatch() {
+
+        User u = new User("Y", "y@mail.com", "000", "user");
+        u.getBorrowedBooks().add(
+                new BorrowRecord("Other", "999", "BOOK",
+                        LocalDate.now(), LocalDate.now().plusDays(2))
+        );
+
+        FileStorage.saveUsers(List.of(u));
+
+        BorrowRecord rec = new BorrowRecord("ABC", "777", "BOOK",
+                LocalDate.now(), LocalDate.now().plusDays(3));
+
+        FileStorage.performReturn("y@mail.com", rec);
+
+        User loaded = FileStorage.findUserByEmail("y@mail.com");
+        assertEquals(1, loaded.getBorrowedBooks().size());
+    }
 }

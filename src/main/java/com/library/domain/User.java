@@ -57,11 +57,7 @@ public class User implements Serializable {
         this.borrowedBooks = borrowedBooks;
     }
 
-    public void setPassword(String password) {
-        if (password == null || password.length() < 6) {
-            throw new IllegalArgumentException("Password must be at least 6 characters");
-        }
-        this.password = password;
-    }
-
+	public void setPassword(String string) {
+		
+	}
 }
