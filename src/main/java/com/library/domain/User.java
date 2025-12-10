@@ -57,7 +57,12 @@ public class User implements Serializable {
         this.borrowedBooks = borrowedBooks;
     }
 
-	public void setPassword(String string) {
-		
-	}
+    public void setPassword(String password) {
+ 
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+
+        this.password = password;
+    }
 }

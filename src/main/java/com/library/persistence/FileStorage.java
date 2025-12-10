@@ -11,9 +11,6 @@ import java.util.*;
 
 public class FileStorage {
 
-    // ===========================
-    //  RESOURCE FILE RESOLVER
-    // ===========================
     private static String getResourcePath(String filename) {
         try {
             URL resource = FileStorage.class.getClassLoader().getResource(filename);
@@ -26,17 +23,14 @@ public class FileStorage {
         }
     }
 
-    // default files (inside resources)
     private static String USER_FILE = getResourcePath("users.txt");
     private static String BOOKS_FILE = getResourcePath("books.txt");
+    private static final String BORROWED_PREFIX = "borrowed=";
 
-    // allow tests to override files
+
     public static void setUserFile(String path) { USER_FILE = path; }
     public static void setBooksFile(String path) { BOOKS_FILE = path; }
 
-    // ===========================
-    //        LOAD USERS
-    // ===========================
     public static List<User> loadUsers() {
         List<User> users = new ArrayList<>();
         File f = new File(USER_FILE);
@@ -68,8 +62,8 @@ public class FileStorage {
                 String borrowedLine = br.readLine();
                 List<BorrowRecord> recs = new ArrayList<>();
 
-                if (borrowedLine != null && borrowedLine.startsWith("borrowed=")) {
-                    String val = borrowedLine.substring("borrowed=".length());
+                if (borrowedLine != null && borrowedLine.startsWith(BORROWED_PREFIX)) {
+                    String val = borrowedLine.substring(BORROWED_PREFIX.length());
                     if (!val.isEmpty()) {
                         for (String it : val.split(";")) {
                             String[] b = it.split("\\|");
@@ -110,7 +104,7 @@ public class FileStorage {
                 ));
 
                 if (u.getBorrowedBooks() == null || u.getBorrowedBooks().isEmpty()) {
-                    pw.println("borrowed=");
+                    pw.println(BORROWED_PREFIX);
                 } else {
                     StringBuilder sb = new StringBuilder();
                     for (BorrowRecord r : u.getBorrowedBooks()) {
@@ -120,7 +114,7 @@ public class FileStorage {
                                 .append(r.getBorrowDate()).append("|")
                                 .append(r.getDeadline()).append(";");
                     }
-                    pw.println("borrowed=" + sb);
+                    pw.println(BORROWED_PREFIX + sb);
                 }
             }
         } catch (IOException e) { e.printStackTrace(); }
