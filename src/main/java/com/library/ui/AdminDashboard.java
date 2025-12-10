@@ -11,17 +11,18 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import javax.swing.WindowConstants;
+
 
 public class AdminDashboard extends JFrame {
 
     private JTabbedPane tabbedPane;
     private JPanel addBookPanel, usersPanel, emailPanel;
-    private JTextField titleField, authorField, isbnField, typeField, copiesField;
 
     public AdminDashboard() {
         setTitle("Library Admin Dashboard");
         setSize(1000, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null);
 
@@ -47,6 +48,12 @@ public class AdminDashboard extends JFrame {
     }
 
     public JPanel createAddBookPanel() {
+    	JTextField titleField = new JTextField();
+    	JTextField authorField = new JTextField();
+    	JTextField isbnField = new JTextField();
+    	JTextField typeField = new JTextField();
+    	JTextField copiesField = new JTextField();
+
         JPanel panel = new JPanel(null);
         panel.setBackground(Color.WHITE);
 
@@ -54,7 +61,6 @@ public class AdminDashboard extends JFrame {
         t1.setBounds(80, 40, 200, 25);
         panel.add(t1);
 
-        titleField = new JTextField();
         titleField.setBounds(80, 65, 400, 35);
         panel.add(titleField);
 
@@ -62,7 +68,6 @@ public class AdminDashboard extends JFrame {
         t2.setBounds(80, 110, 200, 25);
         panel.add(t2);
 
-        authorField = new JTextField();
         authorField.setBounds(80, 135, 400, 35);
         panel.add(authorField);
 
@@ -70,7 +75,6 @@ public class AdminDashboard extends JFrame {
         t3.setBounds(80, 180, 200, 25);
         panel.add(t3);
 
-        isbnField = new JTextField();
         isbnField.setBounds(80, 205, 400, 35);
         panel.add(isbnField);
 
@@ -78,7 +82,6 @@ public class AdminDashboard extends JFrame {
         t4.setBounds(80, 250, 200, 25);
         panel.add(t4);
 
-        typeField = new JTextField();
         typeField.setBounds(80, 275, 200, 35);
         panel.add(typeField);
 
@@ -86,7 +89,6 @@ public class AdminDashboard extends JFrame {
         t5.setBounds(320, 250, 100, 25);
         panel.add(t5);
 
-        copiesField = new JTextField();
         copiesField.setBounds(320, 275, 160, 35);
         panel.add(copiesField);
 
