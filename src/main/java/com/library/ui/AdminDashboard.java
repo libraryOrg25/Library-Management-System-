@@ -18,6 +18,7 @@ public class AdminDashboard extends JFrame {
 
     private JTabbedPane tabbedPane;
     private JPanel addBookPanel, usersPanel, emailPanel;
+    private static final String REMOVE_LABEL = "Remove";
 
     public AdminDashboard() {
         setTitle("Library Admin Dashboard");
@@ -148,7 +149,7 @@ public class AdminDashboard extends JFrame {
                         u.getEmail(),
                         "-", "-", "-",
                         u.getFine() == 0 ? "No" : "Fine: " + u.getFine(),
-                        "Remove"
+                        REMOVE_LABEL
                 });
             } else {
                 for (BorrowRecord r : u.getBorrowedBooks()) {
@@ -164,7 +165,7 @@ public class AdminDashboard extends JFrame {
                             r.getBorrowDate(),
                             r.getDeadline(),
                             (u.getFine() == 0 ? status : "Fine: " + u.getFine()),
-                            "Remove"
+                            REMOVE_LABEL
                     });
                 }
             }
@@ -232,13 +233,13 @@ public class AdminDashboard extends JFrame {
     class ButtonRenderer extends JButton implements javax.swing.table.TableCellRenderer {
         public ButtonRenderer() { setOpaque(true); }
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-            setText("Remove");
+            setText(REMOVE_LABEL);
             return this;
         }
     }
 
     class ButtonEditor extends DefaultCellEditor {
-        private final JButton btn = new JButton("Remove");
+        private final JButton btn = new JButton(REMOVE_LABEL);
         private final DefaultTableModel model;
         private int editingRow = -1;
 
@@ -278,7 +279,7 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(AdminDashboard.this, "User removed.");
             }
 
-            return "Remove";
+            return REMOVE_LABEL;
         }
 
     }
